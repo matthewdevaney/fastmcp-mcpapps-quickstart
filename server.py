@@ -4,6 +4,8 @@ from prefab_ui.app import PrefabApp
 from prefab_ui.components import Column, DataTable, DataTableColumn, Grid
 from prefab_ui.components.charts import PieChart
 from fastmcp import FastMCP
+from starlette.responses import JSONResponse
+import uvicorn
 
 mcp = FastMCP("My First App")
 
@@ -46,3 +48,10 @@ def team_directory() -> PrefabApp:
                 )
 
     return app
+
+
+# Create a Starlette ASGI web application for uvicorn to serve
+app = mcp.http_app()
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)

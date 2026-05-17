@@ -15,25 +15,24 @@ WORKDIR /code
 # If dependencies haven't changed, Docker can reuse this layer and skip re-installing.
 COPY uv.lock pyproject.toml ./
 # Install all Python dependencies from the lock file.
-RUN uv sync --locked --no-install-project
+RUN uv sync --locked --no-install-project --python /usr/local/bin/python3
 
 # Copy the entire application code.
 COPY . .
 # Install the project itself along with dependencies.
-RUN uv sync --locked
+RUN uv sync --locked --python /usr/local/bin/python3
 
 # ------------------- Stage 2: Final Stage ------------------------------
-# This stage only includes what's needed to run the application.
-# Build tools and intermediate files from Stage 1 are not included.
-FROM python:3.14.2-alpine AS final
+# Reuse the build stage as runtime so the uv-managed virtualenv interpreter
+# remains valid (avoids broken interpreter symlinks across image stages).
+FROM build AS final
 
 # Create a non-root user for security. Running as root is a security risk.
 # This user will run the application instead of root.
 RUN addgroup -S app && adduser -S app -G app
 
-# Copy the compiled dependencies and application from the build stage.
-# --chown changes ownership so the app user can access these files.
-COPY --from=build --chown=app:app /code /code
+# The application and virtual environment already exist in this stage.
+RUN chown -R app:app /code
 
 WORKDIR /code
 # Switch to the app user (non-root). All subsequent commands run as this user.
@@ -45,6 +44,6 @@ ENV PATH="/code/.venv/bin:$PATH"
 # Tell Docker that the application listens on port 8000.
 # This documents which port is used, but doesn't publish it automatically.
 EXPOSE 8000
-
+ 
 # Set the default command to run when the container starts.
-CMD ["python", "main.py"]
+CMD ["/code/.venv/bin/python", "server.py"]

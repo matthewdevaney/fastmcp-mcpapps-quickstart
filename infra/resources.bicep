@@ -83,7 +83,7 @@ resource containerEnv 'Microsoft.App/managedEnvironments@2024-02-02-preview' = {
 resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
   name: containerAppName
   location: location
-  tags: union(tags, { 'azd-service-name': 'fastmcp' })
+  tags: union(tags, { 'azd-service-name': 'fastmcp-widgets-quickstart' })
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
