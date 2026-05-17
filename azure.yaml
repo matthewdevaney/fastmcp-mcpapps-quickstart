@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: fastmcp-widgets-quickstart
+metadata:
+    template: azd-init@1.25.1
+services:
+    fastmcp-widgets-quickstart:
+        project: .
+        host: containerapp
+        language: python
+        docker:
+            path: Dockerfile
+resources:
+    fastmcp-widgets-quickstart:
+        type: host.containerapp
+        port: 8000
